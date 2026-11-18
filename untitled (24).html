@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="si" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHAMIX A/L Science Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sinhala: ['"Noto Sans Sinhala"', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Noto Sans Sinhala', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-green-500 to-emerald-400 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-green-500/20">C</div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">CHAMIX A/L Science Hub</h1>
+                    <p class="text-xs text-slate-400">A/L Science - Sinhala Medium</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="app.toggleAdminModal()" class="px-3 py-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-700 transition flex items-center space-x-1.5">
+                    <span id="auth-status-icon">🔒</span>
+                    <span id="auth-status-text">Admin</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 grid grid-cols-1 md:grid-cols-4 gap-6">
+        <!-- Sidebar Navigation -->
+        <aside class="md:col-span-1 space-y-4">
+            <div class="bg-slate-900/80 backdrop-blur border border-slate-800 rounded-2xl p-4 shadow-xl">
+                <!-- User Profile Widget -->
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-800 mb-4">
+                    <div id="user-avatar-container" class="w-12 h-12 rounded-full bg-slate-800 overflow-hidden border-2 border-green-500/30 flex items-center justify-center text-slate-400">
+                        👤
+                    </div>
+                    <div>
+                        <h2 id="greeting-text" class="font-semibold text-sm">සුභ දවසක්!</h2>
+                        <p class="text-xs text-green-400 font-medium" id="active-status-badge">ACTIVE STUDENT</p>
+                    </div>
+                </div>
+
+                <nav class="space-y-1">
+                    <button onclick="app.switchTab('dashboard')" id="nav-dashboard" class="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-3 bg-green-500/10 text-green-400 border border-green-500/20">
+                        <span>🏠</span>
+                        <span>Dashboard & Recordings</span>
+                    </button>
+                    <button onclick="app.switchTab('tasks')" id="nav-tasks" class="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-3 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <span>📝</span>
+                        <span>Daily Task List</span>
+                    </button>
+                    <button onclick="app.switchTab('tracker')" id="nav-tracker" class="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-3 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <span>⏱️</span>
+                        <span>Study Time Tracker</span>
+                    </button>
+                    <button onclick="app.switchTab('settings')" id="nav-settings" class="w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-3 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200">
+                        <span>⚙️</span>
+                        <span>Profile Settings</span>
+                    </button>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Content Area -->
+        <section class="md:col-span-3 space-y-6">
+            <!-- Dashboard Tab -->
+            <div id="tab-dashboard" class="space-y-6">
+                <!-- Subject Selector -->
+                <div class="grid grid-cols-3 gap-3">
+                    <button onclick="app.selectSubject('physics')" id="sub-btn-physics" class="p-4 rounded-2xl border transition flex flex-col items-center justify-center space-y-2 bg-green-500/10 border-green-500/30 text-green-400">
+                        <span class="text-2xl">⚡</span>
+                        <span class="font-semibold text-sm">Physics</span>
+                    </button>
+                    <button onclick="app.selectSubject('chemistry')" id="sub-btn-chemistry" class="p-4 rounded-2xl border transition flex flex-col items-center justify-center space-y-2 bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700">
+                        <span class="text-2xl">🧪</span>
+                        <span class="font-semibold text-sm">Chemistry</span>
+                    </button>
+                    <button onclick="app.selectSubject('biology')" id="sub-btn-biology" class="p-4 rounded-2xl border transition flex flex-col items-center justify-center space-y-2 bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700">
+                        <span class="text-2xl">🧬</span>
+                        <span class="font-semibold text-sm">Biology</span>
+                    </button>
+                </div>
+
+                <!-- Filters & Controls -->
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="flex items-center space-x-3 w-full sm:w-auto">
+                        <select id="filter-year" onchange="app.renderContent()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-green-500">
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                        </select>
+                        <select id="filter-month" onchange="app.renderContent()" class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-green-500">
+                            <option value="October">October</option>
+                            <option value="November">November</option>
+                            <option value="January">January</option>
+                        </select>
+                    </div>
+                    <div id="admin-actions-container" class="hidden">
+                        <button onclick="app.openAddContentModal()" class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-xl text-sm font-semibold transition shadow-lg shadow-green-600/20 flex items-center space-x-2">
+                            <span>+ Add Content</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recordings List -->
+                <div class="space-y-4">
+                    <h3 class="font-bold text-md text-slate-200">Class Recordings</h3>
+                    <div id="recordings-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Dynamic Recordings -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks Tab -->
+            <div id="tab-tasks" class="hidden space-y-6">
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4">
+                    <h3 class="font-bold text-lg">Daily Task List</h3>
+                    <div class="flex space-x-2">
+                        <input type="text" id="new-task-input" placeholder="අද කළ යුතු වැඩක් ලියන්න..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-green-500">
+                        <button onclick="app.addTask()" class="px-5 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-xl text-sm font-semibold transition">Add</button>
+                    </div>
+                    <div id="tasks-container" class="space-y-2">
+                        <!-- Dynamic Tasks -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tracker Tab -->
+            <div id="tab-tracker" class="hidden space-y-6">
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-6">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-lg">Study Time Tracker</h3>
+                        <div id="timer-display" class="text-3xl font-mono font-bold text-green-400">00:00:00</div>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button onclick="app.startTimer()" id="timer-start-btn" class="px-6 py-2.5 bg-green-600 hover:bg-green-500 text-white rounded-xl text-sm font-semibold transition">Start</button>
+                        <button onclick="app.pauseTimer()" id="timer-pause-btn" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-sm font-semibold transition">Pause</button>
+                        <button onclick="app.resetTimer()" class="px-6 py-2.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 rounded-xl text-sm font-semibold transition">Reset & Save</button>
+                    </div>
+                    <!-- Chart -->
+                    <div class="pt-4 border-t border-slate-800">
+                        <canvas id="studyChart" height="120"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="tab-settings" class="hidden space-y-6">
+                <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4">
+                    <h3 class="font-bold text-lg">Profile Settings</h3>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Your Name / Greeting Name</label>
+                        <input type="text" id="settings-name-input" oninput="app.updateProfileName(this.value)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-green-500" placeholder="ඔබේ නම...">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Admin Login Modal -->
+    <div id="admin-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md space-y-4">
+            <h3 class="font-bold text-lg">Admin Authentication</h3>
+            <input type="password" id="admin-pass-input" placeholder="Enter password (chamix123)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-green-500">
+            <div class="flex justify-end space-x-3">
+                <button onclick="app.toggleAdminModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-sm">Cancel</button>
+                <button onclick="app.verifyAdmin()" class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-xl text-sm font-semibold">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Content Modal -->
+    <div id="add-content-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md space-y-4">
+            <h3 class="font-bold text-lg">Add New Recording</h3>
+            <input type="text" id="new-rec-title" placeholder="Title (e.g. Day 01)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-green-500">
+            <input type="text" id="new-rec-topic" placeholder="Topic Name" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-green-500">
+            <input type="text" id="new-rec-url" placeholder="YouTube URL" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-green-500">
+            <div class="flex justify-end space-x-3">
+                <button onclick="app.openAddContentModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-sm">Cancel</button>
+                <button onclick="app.saveNewContent()" class="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-xl text-sm font-semibold">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const INITIAL_DATA = {"content":{"physics":{"recordings":[{"id":"item_1794976330256","title":"Day 01","topic":"ඒකක හා මාන","year":"2026","month":"October","url":"https://youtu.be/7oEHd7uUXwM?si=4ndkixdWHHVfNHX_"},{"id":"item_1794976389032","title":"Day 02","topic":"ඒකක හා මාන","year":"2026","month":"October","url":"https://youtu.be/NCxwhiVI2rE?si=HakDNxY6dkNaIwLi"},{"id":"item_1794977414860","title":"දෛශික","topic":"යාන්ත්‍ර විද්‍යාව","year":"2026","month":"October","url":"https://youtu.be/AHhzC5HIJQo?si=jMsV5ZqzcpS_vSsx"},{"id":"item_1794976419640","title":"ස්කන්ධය හා කාලය මැනීම","topic":"ඒකක හා මාන","year":"2026","month":"October","url":"https://youtu.be/Q8fmPTncY3M?si=22PHag2k2mR--SWq"},{"id":"item_1794977642229","title":"චලිත ප්‍රස්ථාර","topic":"යාන්ත්‍ර විද්‍යාව","year":"2026","month":"October","url":"https://youtu.be/iR2gfxVMoUY?si=oylVeQNW5IVn6Pfw"},{"id":"item_1794977585910","title":"චලිත සමීකරණ","topic":"යාන්ත්‍ර විද්‍යාව","year":"2026","month":"October","url":"https://youtu.be/ZjrFYRSu2I4?si=JDo..."id":"item_1794982585101","title":"Day 02(ස්නායු පද්ධතිය)","topic":"සත්ව ආකාරය/ක්‍රියාකාරීත්වය","year":"2026","month":"November","url":"https://youtu.be/XM8EEH49Du4?si=VVcwV7UjafFTJGGu"},{"id":"item_1794989414292","title":"Day 03(පර්යන්ත ස්නායු පද්ධතිය/ආවේග සම්ප්‍රේෂණය)","topic":"සත්ව ආකාරය/ක්‍රියාකාරීත්වය","year":"2027","month":"November","url":"https://youtu.be/7DS3MhlQT0A?si=n-XYSttltf_MqvBQ"}],"pdfs":[]}},"topics":{"physics":{"November":["යාන්ත්‍ර විද්‍යාව","ද්‍රවස්ථිතිය","බ'නූලී මූලධර්මය","තාපය","තාපමිතිය Ceminar","විද්‍යුත් ක්ෂේත්‍ර"],"January":[],"October":["ඒකක හා මාන","යාන්ත්‍ර විද්‍යාව","ගුරුත්වාකර්ෂණ ක්ෂේත්‍ර"]},"chemistry":{"November":["ශක්ති විද්‍යාව"],"January":[],"September":["වායු නියම","ව්‍යුහය හා බන්ධන","Extra Videos"],"October":["රසායනික ගණනය","Extra Videos"]},"biology":{"November":["සත්ව ආකාරය/ක්‍රියාකාරීත්වය"],"January":[],"September":["ශාක ආකාරය හා ක්‍රියාකාරීත්වය"],"October":["ශාක ආකාරය හා ක්‍රියාකාරීතවය","පරිණාමය හා ජීවීන්ගේ විවිධත්වය"]}},"tasks":[],"logs":[]};
+
+        class App {
+            constructor() {
+                this.content = JSON.parse(localStorage.getItem('chamix_content_db')) || INITIAL_DATA.content;
+                this.topics = JSON.parse(localStorage.getItem('chamix_month_topics_db')) || INITIAL_DATA.topics;
+                this.tasks = JSON.parse(localStorage.getItem('chamix_tasks')) || INITIAL_DATA.tasks;
+                this.logs = JSON.parse(localStorage.getItem('chamix_study_logs')) || INITIAL_DATA.logs;
+                this.currentSubject = 'physics';
+                this.isAdmin = false;
+                this.timerInterval = null;
+                this.secondsElapsed = 0;
+                this.init();
+            }
+
+            init() {
+                this.renderContent();
+                this.renderTasks();
+                this.initChart();
+            }
+
+            save() {
+                localStorage.setItem('chamix_content_db', JSON.stringify(this.content));
+                localStorage.setItem('chamix_month_topics_db', JSON.stringify(this.topics));
+                localStorage.setItem('chamix_tasks', JSON.stringify(this.tasks));
+                localStorage.setItem('chamix_study_logs', JSON.stringify(this.logs));
+            }
+
+            switchTab(tabId) {
+                ['dashboard', 'tasks', 'tracker', 'settings'].forEach(t => {
+                    document.getElementById(`tab-${t}`).classList.add('hidden');
+                    document.getElementById(`nav-${t}`).className = "w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-3 text-slate-400 hover:bg-slate-800/60 hover:text-slate-200";
+                });
+                document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+                document.getElementById(`nav-${tabId}`).className = "w-full text-left px-3 py-2.5 rounded-xl text-sm font-medium transition flex items-center space-x-3 bg-green-500/10 text-green-400 border border-green-500/20";
+            }
+
+            selectSubject(sub) {
+                this.currentSubject = sub;
+                ['physics', 'chemistry', 'biology'].forEach(s => {
+                    const btn = document.getElementById(`sub-btn-${s}`);
+                    if (s === sub) {
+                        btn.className = "p-4 rounded-2xl border transition flex flex-col items-center justify-center space-y-2 bg-green-500/10 border-green-500/30 text-green-400";
+                    } else {
+                        btn.className = "p-4 rounded-2xl border transition flex flex-col items-center justify-center space-y-2 bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700";
+                    }
+                });
+                this.renderContent();
+            }
+
+            renderContent() {
+                const year = document.getElementById('filter-year').value;
+                const month = document.getElementById('filter-month').value;
+                const container = document.getElementById('recordings-list');
+                container.innerHTML = '';
+
+                const subData = this.content[this.currentSubject] || { recordings: [] };
+                const filtered = subData.recordings.filter(r => r.year === year && r.month === month);
+
+                if (filtered.length === 0) {
+                    container.innerHTML = `<div class="col-span-2 text-center py-8 text-slate-500 text-sm">གන දත්ත හමුවී නැත.</div>`;
+                    return;
+                }
+
+                filtered.forEach(rec => {
+                    container.innerHTML += `
+                        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300">${rec.topic}</span>
+                                    <h4 class="font-bold text-base mt-2">${rec.title}</h4>
+                                </div>
+                                ${this.isAdmin ? `<button onclick="app.deleteRecording('${rec.id}')" class="text-rose-400 text-xs">Delete</button>` : ''}
+                            </div>
+                            <a href="${rec.url}" target="_blank" class="block w-full text-center py-2 bg-green-600/10 hover:bg-green-600/20 text-green-400 border border-green-500/20 rounded-xl text-sm font-semibold transition">Watch Video</a>
+                        </div>
+                    `;
+                });
+            }
+
+            toggleAdminModal() {
+                const modal = document.getElementById('admin-modal');
+                modal.classList.toggle('hidden');
+            }
+
+            verifyAdmin() {
+                const pass = document.getElementById('admin-pass-input').value;
+                if (pass === 'chamix123') {
+                    this.isAdmin = true;
+                    document.getElementById('auth-status-icon').innerText = '🔓';
+                    document.getElementById('auth-status-text').innerText = 'Admin Active';
+                    document.getElementById('admin-actions-container').classList.remove('hidden');
+                    this.toggleAdminModal();
+                    this.renderContent();
+                } else {
+                    alert('მცරැදු මුරපදයකි!');
+                }
+            }
+
+            openAddContentModal() {
+                document.getElementById('add-content-modal').classList.toggle('hidden');
+            }
+
+            saveNewContent() {
+                const title = document.getElementById('new-rec-title').value;
+                const topic = document.getElementById('new-rec-topic').value;
+                const url = document.getElementById('new-rec-url').value;
+                const year = document.getElementById('filter-year').value;
+                const month = document.getElementById('filter-month').value;
+
+                if (!title || !url) return;
+
+                if (!this.content[this.currentSubject]) {
+                    this.content[this.currentSubject] = { recordings: [], pdfs: [] };
+                }
+
+                this.content[this.currentSubject].recordings.push({
+                    id: 'item_' + Date.now(),
+                    title, topic, year, month, url
+                });
+
+                this.save();
+                this.openAddContentModal();
+                this.renderContent();
+            }
+
+            deleteRecording(id) {
+                if (!confirm('លុบ ද போட?')) return;
+                this.content[this.currentSubject].recordings = this.content[this.currentSubject].recordings.filter(r => r.id !== id);
+                this.save();
+                this.renderContent();
+            }
+
+            addTask() {
+                const input = document.getElementById('new-task-input');
+                if (!input.value) return;
+                this.tasks.push({ id: Date.now(), text: input.value, completed: false });
+                input.value = '';
+                this.save();
+                this.renderTasks();
+            }
+
+            renderTasks() {
+                const container = document.getElementById('tasks-container');
+                container.innerHTML = '';
+                this.tasks.forEach(t => {
+                    container.innerHTML += `
+                        <div class="flex items-center justify-between bg-slate-950 border border-slate-800 rounded-xl p-3">
+                            <span class="text-sm ${t.completed ? 'line-through text-slate-500' : ''}">${t.text}</span>
+                            <button onclick="app.toggleTask(${t.id})" class="text-xs px-3 py-1 rounded-lg ${t.completed ? 'bg-slate-800 text-slate-400' : 'bg-green-600/20 text-green-400'}">${t.completed ? 'Done' : 'Complete'}</button>
+                        </div>
+                    `;
+                });
+            }
+
+            toggleTask(id) {
+                this.tasks = this.tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+                this.save();
+                this.renderTasks();
+            }
+
+            startTimer() {
+                if (this.timerInterval) return;
+                this.timerInterval = setInterval(() => {
+                    this.secondsElapsed++;
+                    const hrs = String(Math.floor(this.secondsElapsed / 3600)).padStart(2, '0');
+                    const mins = String(Math.floor((this.secondsElapsed % 3600) / 60)).padStart(2, '0');
+                    const secs = String(this.secondsElapsed % 60).padStart(2, '0');
+                    document.getElementById('timer-display').innerText = `${hrs}:${mins}:${secs}`;
+                }, 1000);
+            }
+
+            pauseTimer() {
+                clearInterval(this.timerInterval);
+                this.timerInterval = null;
+            }
+
+            resetTimer() {
+                this.pauseTimer();
+                if (this.secondsElapsed > 0) {
+                    this.logs.push({ date: new Date().toLocaleDateString(), duration: Math.floor(this.secondsElapsed / 60) });
+                    this.save();
+                }
+                this.secondsElapsed = 0;
+                document.getElementById('timer-display').innerText = '00:00:00';
+            }
+
+            initChart() {
+                const ctx = document.getElementById('studyChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                        datasets: [{ label: 'Study Mins', data: [45, 60, 120, 90, 30, 150, 80], backgroundColor: '#22c55e' }]
+                    },
+                    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                });
+            }
+
+            updateProfileName(name) {
+                document.getElementById('greeting-text').innerText = name ? `සුභ දවසක්, ${name}!` : 'සුභ දවසක්!';
+            }
+        }
+
+        const app = new App();
+    </script>
+</body>
+</html>
